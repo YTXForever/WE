@@ -5,6 +5,8 @@
 
     2.活跃的进程指的是Running + Runnable + iowait三种进程的总和，这三种进程的共性的就是都需要cpu。
 
+    3.理论上当load average和cpu核数相同时，代表cpu负载刚好，如果超出70%则要进行排查原因。
+
 ## 问题
     1.load过高怎么排查？
         1）mpstat 查看cpu的使用率和iowait的情况
