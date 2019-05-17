@@ -14,7 +14,7 @@
 
 *I changed my plan when I'm hungry or tired,*
 
-*I changed my plan when I see preety girls.*
+*I changed my plan when I see pretty girls.*
 
 *so ,  pitttty*
 
