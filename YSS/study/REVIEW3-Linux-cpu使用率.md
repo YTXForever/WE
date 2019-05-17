@@ -7,5 +7,18 @@
     以top为例 这段时间就是3s
 
     2.名词解释
+    us 用户态cpu  不包括nice 但是包括guest
+    sys 内核态cpu 
+    nice/ni 低优先级用户态cpu 也就是nice值被被调整为1-19的的cpu 取值范围 -20-19 数值越大 优先级越低
+    idle 代表cpu空闲状态
+    iowait cpu等待I/O的时间
+    irq/hi 硬中断 是硬件发出的中断 比如键盘 网卡 通知内核读取
+    softirq / si 软中断 是正在执行的进程发出的中断信号 大部分是告诉内核为其进行I/O操作
 ## 问题
+    1.cpu使用率过高到底怎么办
+    top一下 看哪个进程占的多 如果是java进程 直接一套jstack带走
+    也可以pidstat -u 看一下进程sys和us，大部分是us出现的问题 就需要在自己的代码中找问题
+    如果不是java进程 使用perf top 定位一下cpu使用率很高的函数 
+    
+
    
