@@ -31,9 +31,11 @@
     total：总物理内存
     free：空闲物理内存
     shared:被进程共享的物理内存
-    buffers：缓存 比如 读文件的时候会将文件缓存到内存中，下次从内存中读取
-    cache:缓冲区 比如 收发网络包的时候 会将网络包收进缓冲区 然后在送给进程
+    buffers：对于磁盘读写的缓存
+    cache对于文件读写的缓存
     -/+ buffers/cache: 实际使用的内存和实际空余的内存 used-buffers-cache/free+buffer+cache
     used包括buffer和cache free不包括buffer和cache
+
+    vmstat可以查看 buffer 和 cache 情况
 
 
