@@ -37,4 +37,4 @@
     df -i 查看inode使用磁盘情况
 
 ## 缓存
-    inode和dentry被缓存在slab缓存中
+    inode和dentry被缓存在slab缓存中 cat /proc/slabinfo 
