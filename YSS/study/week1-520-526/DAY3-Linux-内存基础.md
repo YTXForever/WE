@@ -35,7 +35,25 @@
     cache对于文件读写的缓存
     -/+ buffers/cache: 实际使用的内存和实际空余的内存 used-buffers-cache/free+buffer+cache
     used包括buffer和cache free不包括buffer和cache
-
     vmstat可以查看 buffer 和 cache 情况
+
+## 啥是脏页
+    指的是写入buffers或者cache但是还没有刷新到硬盘上的文件页
+
+## linux内存的分类
+    内存可以分为文件页和匿名页，文件页一般指的是cache和buffers，匿名页一般指的是应用程序占用的内存
+
+## linux的内存不足的时候怎么办
+    1.根据LRU算法释放文件页的内存
+    2.杀死发生OOM的进程
+    3.swap
+
+## linux什么时候内存会不足
+    内核线程kswapd0会定期扫描内存的使情况，当可用内存小于pages_low并且大于pages_min时，kswapd0会触发内存回收，使用cat /proc/zoneinfo查看内存的阈值
+    pages_low=pages_min*5/4
+    pages_high=pages_min*3/2
+
+## NUMA架构
+    在NUMA架构下，不同的cpu会被划分到不同的Node上，每个Node又有自己的内存空间，当然cpu也可以使用别的Node下的内存空间，使用numactl --hardware查看处理器在Node上的分布情况
 
 
