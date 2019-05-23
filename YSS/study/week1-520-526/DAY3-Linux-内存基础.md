@@ -32,7 +32,7 @@
     free：空闲物理内存
     shared:被进程共享的物理内存
     buffers：对于磁盘读写的缓存
-    cache对于文件读写的缓存
+    cache对于文件读写的缓存 实际上是cache页缓存和slab缓存的和
     -/+ buffers/cache: 实际使用的内存和实际空余的内存 used-buffers-cache/free+buffer+cache
     used包括buffer和cache free不包括buffer和cache
     vmstat可以查看 buffer 和 cache 情况
