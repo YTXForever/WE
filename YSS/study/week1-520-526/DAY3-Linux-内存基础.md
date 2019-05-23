@@ -46,7 +46,7 @@
 ## linux的内存不足的时候怎么办
     1.根据LRU算法释放文件页的内存
     2.杀死发生OOM的进程
-    3.swap
+    3.swap匿名页的内存
 
 ## linux什么时候内存会不足
     内核线程kswapd0会定期扫描内存的使情况，当可用内存小于pages_low并且大于pages_min时，kswapd0会触发内存回收，使用cat /proc/zoneinfo查看内存的阈值
