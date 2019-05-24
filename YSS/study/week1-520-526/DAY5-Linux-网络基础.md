@@ -87,8 +87,7 @@
        Round Trip time 每个包的往返时间 最小 平均 最大
     rtt min/avg/max/mdev = 29.919/29.931/29.961/0.190 ms
 
-
-
-
-
-
+## select poll epoll
+    select 将文件描述符放入一个数组当中，select会遍历这个数组并且返回ready的数目 内核会修改fd的状态，所以执行select的时候 必须将fd_set从用户态拷贝到内核态，然后还要讲fd_set从内核态拷贝到用户态，有性能损耗，然后通过fd状态的变化，拿到最终需要操作的句柄O(n)
+    poll 模式与select相同 但是没有fd_set的句柄数限制O(n)
+    epoll event poll 采用事件注册机制 先要把关注的事件注册到epoll实例上 调用epoll_wait返回准备好的句柄数 并且在readyList里面取出准备好的句柄  调用注册epoll_wait时拷贝进内核保存 其余时间不拷贝 O(1)
