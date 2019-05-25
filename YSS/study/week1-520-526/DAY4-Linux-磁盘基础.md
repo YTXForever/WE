@@ -57,3 +57,11 @@
     2.iostat 确认一下写入磁盘使用率 读写速度 队列长度
     3.pidstat -d 看一下是哪个进程IO比较频繁
     4.lsof -p 看下这个进程打开了哪些文件或者socket
+
+## 排查iowait问题的一般步骤
+    1.top 查看iowait
+    2.iostat -x -d 1 查看使用率
+    3.pidstat -d 1 查看进程
+    4.strace -p pid 查看系统调用
+    5.lsof -p pid 查看打开的文件
+    6.具体处理
