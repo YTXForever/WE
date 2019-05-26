@@ -23,3 +23,11 @@
         4.new
         5.子类初始化会导致父类初始化
         6.new Demo[] 此时Demo类并不会进行初始化
+
+## 反射有几种实现
+    1.通过查看Method源代码查看反射通过委托给MethodAccessor来实现
+    2.MethodAccessor有一个抽象子类MethodAccessorImpl
+    3.MethodAccessorImpl有子类DelegatingMethodAccessorImpl和NativeMethodAccessorImpl
+    4.默认情况下，DelegatingMethodAccessorImpl会选择NativeMethodAccessorImpl作为其delegate实现invoke，后者是通过本地方法invoke0实现的反射调用，后者还会将DelegatingMethodAccessorImpl设置parent，当执行到一定次数时，就会把delegate替换为MethodAccessorGenerator生成的java实现以提高性能，但是这个生成过程比较慢，所以次数比较少的调用没有必要用这种方式
+    5.可以强制使用这种生成java代理的方式，也可以配置反射执行次数的阈值
+    6.这个次数是以Method为单位记录的
