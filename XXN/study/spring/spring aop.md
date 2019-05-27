@@ -37,14 +37,44 @@
             <aop:after method="after" pointcut-ref="allMethod" />
         </aop:aspect>
     </aop:config>
+源码解析文档:
+
+http://www.importnew.com/24430.html
+
+http://www.importnew.com/24459.html
+
 ### 2.1spring加载配置文件
 
  spring加载application.xml在loadBeanDefinition时，BeanDefinitionParser  parser  xml的命名空间。
 
 ConfigBeanDefinitionParser生成aop的beandefinition。其中configureAutoProxyCreator方法很重要，生成自动代理类。标签proxy-target-class，标志使用jdk代理还是cglib代理
 
- pointcut:   
+- config–>ConfigBeanDefinitionParser
 
- advisor:
+- aspectj-autoproxy–>AspectJAutoProxyBeanDefinitionParser
 
- aspect:
+- scoped-proxy–>ScopedProxyBeanDefinitionDecorator
+
+- spring-configured–>SpringConfiguredBeanDefinitionParser
+
+  ConfigBeanDefinitionParser类加载aspect标签：
+
+1. 根据织入方式（before、after这些）创建RootBeanDefinition，名为adviceDef即advice定义
+
+2. 将上一步创建的RootBeanDefinition写入一个新的RootBeanDefinition，构造一个新的对象，名为advisorDefinition，即advisor定义
+
+3. 将advisorDefinition注册到DefaultListableBeanFactory中
+
+4. 织入的bean对应的class为：
+
+   before对应AspectJMethodBeforeAdvice
+
+   After对应AspectJAfterAdvice
+
+   after-returning对应AspectJAfterReturningAdvice
+
+   after-throwing对应AspectJAfterThrowingAdvice
+
+   around对应AspectJAroundAdvice
+
+   在bean初始化的时候，判断这个bean是否需要代理，如果需要，按照设置的代理方式，生成代理对象
