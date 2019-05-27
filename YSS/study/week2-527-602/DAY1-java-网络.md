@@ -67,4 +67,24 @@
     3.有序性 tcp有seq保证顺序 udp没有
     4.速度  tcp有拥塞控制可能会降低速度 udp只取决于网络状况和主机性能
     5.量级  tcp需要维护很多状态 header也很大20bytes udp只有8bytes
+
+### 滑动窗口
+    发送方
+    acked|not acked|not send
+        1           2
+    根据自己的win能判断自己能发送多少数据 win-(2-1)
+    此时也要参考接收方的win大小         recv_win-(2-1)
+    取较小值发送 
+    窗口随着acked的递增而增加
+    接收方
+    acked|not recv|not permitted recv
+            win
+    这个win会发送到发送方
+    窗口随着acked的增加而增加
     
+    作用
+        1.顺序控制 前面的接收不到 窗口不滑动 后面也接收不到 窗口起始是根据最后一个acked位置确定的
+        2.流量控制 只能接收窗口大小的数据 
+### 重传机制
+    RTO 重传间隔
+    当数据包发出后会会加入重传队列 当定时器到时间之后未收到ack就会重传
