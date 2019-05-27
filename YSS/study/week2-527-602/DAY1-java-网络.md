@@ -36,3 +36,20 @@
     7.seq和ack的增长规律
         seq是根据自己发送的数据量增长的 SYN FIN无数据但是也会消耗一个seq
         ack是根据对方的seq和len计算的 seq+len 也就是对方的下一个seq
+### 四次挥手
+    1.流程
+        established             established
+        finish_wait1        
+                                close_wait
+        finish_wait2
+                                last_ack
+        time_wait
+        closed                  closed
+    2.time_wait的作用
+        1.time_wait长2MSL 主动断开方收到last_ack后发送ack，成为此状态，是为了保证发送出去的ack能被对方收到，比如这个发出的包丢包了（1MSL），那么被动断开方将重传这个包(1MSL),这个时候主动断开方还应该在线并且能够给与回复
+        2.如果不设置等待时间，发出的最后一个包发生了丢包的话，另一方会重传，如果这个时候这个socket已经被新连接重用了的话，会造成新包和旧包的混淆
+    3.为什么需要四次挥手
+        因为tcp连接是全双工的，就想三次握手一样，会初始化两个seq，四次挥手也是为了确保，两边都确认连接被断开，三次不够，因为被动断开方不能立即回复last_ack ，因为有可能还有数据没有传输完成
+    4.close_wait过多
+        1.服务端忙于读写，没有及时处理对方的close
+        2.线程数过少
