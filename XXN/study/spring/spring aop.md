@@ -77,4 +77,4 @@ ConfigBeanDefinitionParser生成aop的beandefinition。其中configureAutoProxyC
 
    around对应AspectJAroundAdvice
 
-   在bean初始化的时候，判断这个bean是否需要代理，如果需要，按照设置的代理方式，生成代理对象
+   在bean初始化的时候，判断这个bean是否需要代理，如果需要，按照设置的代理方式，生成代理对象(cglib/jdk)
