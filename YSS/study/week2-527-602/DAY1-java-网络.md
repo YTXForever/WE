@@ -53,3 +53,18 @@
     4.close_wait过多
         1.服务端忙于读写，没有及时处理对方的close
         2.线程数过少
+    5.netstat -an|awk '/^tcp/{state[$NF]++} END {for(k in state){print k,state[k]}}'
+
+###udp
+    1.udp的头
+        |src port(2 bytes)|dst port(2 bytes)|crc(2 bytes)|length(2bytes)
+
+### tcp和udp的区别
+    1.连接 
+        tcp面向连接 udp无连接
+    2.可靠性
+        tcp可靠 丢包重传    udp不保证
+    3.有序性 tcp有seq保证顺序 udp没有
+    4.速度  tcp有拥塞控制可能会降低速度 udp只取决于网络状况和主机性能
+    5.量级  tcp需要维护很多状态 header也很大20bytes udp只有8bytes
+    
