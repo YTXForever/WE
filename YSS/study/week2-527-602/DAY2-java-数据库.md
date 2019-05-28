@@ -42,4 +42,9 @@
     事务是保证数据能不能读到的
     锁是看执行知否被阻塞的
     事务的提交会导致锁的释放
+## 当前读和快照读
+    当前读：update delete insert in share mode for update 都会加锁 rowkey + gaplock
+    快照读：Rc是每次新建快照 每次读到提交的最新数据 RR是第一次select建立快照 在整个事务内不变
+## RR如何解决幻读问题
+   next key lock 
 
