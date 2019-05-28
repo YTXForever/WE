@@ -90,6 +90,31 @@ public class DoubleLinkedList {
         return data;
     }
 
+    public int remove(int data) {
+        Node curr = head;
+        while (curr != null && curr.data != data) {
+            curr = curr.next;
+        }
+        if (curr == null) {
+            return Integer.MIN_VALUE;
+        }
+        if (curr == head) {
+            return removeFirst();
+        }
+        if (curr == tail) {
+            return removeTail();
+        }
+        int rt = curr.data;
+        if (curr.next != null) {
+            curr.next.prev = curr.prev;
+        }
+        if (curr.prev != null) {
+            curr.prev.next = curr.next;
+        }
+        curr.next = curr.prev = null;
+        return rt;
+    }
+
     @Override
     public String toString() {
         if (head == null) {
@@ -115,9 +140,11 @@ public class DoubleLinkedList {
         System.out.println(doubleLinkedList);
         doubleLinkedList.removeFirst();
         System.out.println(doubleLinkedList);
-        doubleLinkedList.removeTail();
-        doubleLinkedList.removeTail();
-        doubleLinkedList.removeTail();
+//        doubleLinkedList.removeTail();
+//        doubleLinkedList.removeTail();
+//        doubleLinkedList.removeTail();
+        doubleLinkedList.remove(3);
         System.out.println(doubleLinkedList);
+
     }
 }
