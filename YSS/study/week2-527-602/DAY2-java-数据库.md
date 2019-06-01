@@ -47,4 +47,7 @@
     快照读：Rc是每次新建快照 每次读到提交的最新数据 RR是第一次select建立快照 在整个事务内不变
 ## RR如何解决幻读问题
    next key lock 
+## count问题
+    1.count(*) count(1/anything) count(pk) 效果是一样的 走的不一定是主键索引
+    2.count(field) 走的一定是指定的field 无论有没有索引
 
