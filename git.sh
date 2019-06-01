@@ -7,7 +7,7 @@ if [ $# -eq 0 ];then
 	echo "-v verbose"
 	exit 0
 fi
-
+VERBOSE=0
 if [ "$1" == "-v" ];then
 	VERBOSE=1
 	shift
