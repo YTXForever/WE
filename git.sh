@@ -6,21 +6,21 @@ if [ "$1" == "-v" ];then
 	shift
 fi
 if [ "$1" == "" ];then
-	echo "commit message is blank"
+	echo "**commit message is blank**"
 	exit 1
 fi
 [ $VERBOSE -eq  1 ] && git pull || git pull > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo "pull error"
+	echo "**pull error**"
 	exit 1
 fi
-echo "pull complete"
+echo "**pull complete**"
 [ $VERBOSE -eq 1 ] && git add . || git add . > /dev/null 2>&1
 [ $VERBOSE -eq 1 ] && git commit -m $1||git commit -m $1 > /dev/null 2>&1
 [ $VERBOSE -eq 1 ] && git push || git push > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo "push error"
+	echo "**push error**"
 	exit 1
 fi
-echo "push complete"
+echo "**push complete**"
 exit 0
