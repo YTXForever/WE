@@ -9,7 +9,7 @@ if [ "$1" == "" ];then
 	echo "commit message is blank"
 	exit 1
 fi
-[ VERBOSE == 1 ] && git pull || git pull > /dev/null 2>&1
+[ $VERBOSE == 1 ] && git pull || git pull > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "pull error"
 	exit 1
