@@ -15,9 +15,9 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 echo "pull complete"
-git add . > /dev/null 2>&1
-git commit -m $1 > /dev/null 2>&1
-git push > /dev/null 2>&1
+[$VWEBOSE -eq 1 ] && git add . || git add . > /dev/null 2>&1
+[$VERBOSE -eq 1 ] && git commit -m $1||git commit -m $1 > /dev/null 2>&1
+[$VERBOSE -eq 1 ] && git push || git push > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "push error"
 	exit 1
