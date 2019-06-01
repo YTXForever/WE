@@ -1,15 +1,15 @@
 #!/bin/bash
 #
 
-if [ $# -eq 0 ];then
-	echo "please input commit message"
-	exit 1
-fi	
-if [ $1 == ""];then
+if [ "$1" == "-v" ];then
+	VERBOSE=1
+	shift
+fi
+if [ "$1" == "" ];then
 	echo "commit message is blank"
 	exit 1
 fi
-git pull > /dev/null 2>&1
+[ VERBOSE == 1 ] && git pull || git pull > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "pull error"
 	exit 1
@@ -23,4 +23,4 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 echo "push complete"
-exit(0)
+exit 0
