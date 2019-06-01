@@ -1,6 +1,13 @@
 #!/bin/bash
 #
 
+if [ $# -eq 0 ];then
+	echo "**Usage Of git.sh**"
+	echo "git.sh [-v] "input your commit message here""
+	echo "-v verbose"
+	exit 0
+fi
+
 if [ "$1" == "-v" ];then
 	VERBOSE=1
 	shift
@@ -16,7 +23,7 @@ if [ $? -ne 0 ]; then
 fi
 echo "**pull complete**"
 [ $VERBOSE -eq 1 ] && git add . || git add . > /dev/null 2>&1
-[ $VERBOSE -eq 1 ] && git commit -m $1||git commit -m $1 > /dev/null 2>&1
+[ $VERBOSE -eq 1 ] && git commit -m "$1"||git commit -m "$1" > /dev/null 2>&1
 [ $VERBOSE -eq 1 ] && git push || git push > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "**push error**"
