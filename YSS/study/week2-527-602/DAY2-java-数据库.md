@@ -49,5 +49,6 @@
    next key lock 
 ## count问题
     1.count(*) count(1/anything) count(pk) 效果是一样的 走的不一定是主键索引
-    2.count(field) 走的一定是指定的field 无论有没有索引
+    2.count(field) 走的一定是指定的field 无论有没有索引 为NULL就不计数
+    3.count(*/1/other) 走的就是索引 只要一个字段有值就算一行
 
