@@ -1,5 +1,7 @@
 package str;
 
+import java.util.Arrays;
+
 /**
  * @author yuh
  * @date 2019-05-31 10:07
@@ -23,7 +25,15 @@ public class Str {
 //        throw new RuntimeException();
 //        System.out.println(c == s2);
 
-        System.out.println(indexOf("aa","bcaa"));
+//        System.out.println(indexOf("aa", "bcaa"));
+
+
+        char[] chars = {'a', 'b', 'c'};
+        char[] chars1 = {'a', 'b', 'c','d'};
+        reverse(chars);
+        reverse(chars1);
+        System.out.println(Arrays.toString(chars));
+        System.out.println(Arrays.toString(chars1));
     }
 
 
@@ -43,4 +53,14 @@ public class Str {
         }
         return -1;
     }
+
+
+    public static void reverse(char[] chars) {
+        for (int i = 0; i < chars.length / 2; i++) {
+            char tmp = chars[i];
+            chars[i] = chars[chars.length - i - 1];
+            chars[chars.length - i - 1] = tmp;
+        }
+    }
+
 }

@@ -83,6 +83,7 @@ public class Trie {
     }
 
 
+
     private void buildFailTree() {
         LinkedList<Node> nodes = new LinkedList<>();
         nodes.addFirst(root);
@@ -146,10 +147,6 @@ public class Trie {
 
 
     public static void main(String[] args) {
-        Trie trie = new Trie();
-        trie.add("YSS");
-        trie.add("YTX");
-        trie.buildFailTree();
-        System.out.println(trie.matchAll("YSS❤YTX",true));
+
     }
 }
