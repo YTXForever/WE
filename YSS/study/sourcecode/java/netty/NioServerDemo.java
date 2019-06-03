@@ -26,6 +26,7 @@ import java.util.Set;
 public class NioServerDemo {
 
     public static void main(String[] args) throws IOException {
+        EventLoopGroup eventLoopGroup = new EventLoopGroup();
         SelectorProvider provider = SelectorProvider.provider();
         AbstractSelector selector = provider.openSelector();
         ServerSocketChannel serverSocketChannel = provider.openServerSocketChannel();
@@ -33,7 +34,6 @@ public class NioServerDemo {
         SelectionKey selectionKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         serverSocketChannel.bind(new InetSocketAddress(8888));
         for (; ; ) {
-//            System.out.println("select...");
             int select = selector.select();
             if (select == 0) {
                 continue;
@@ -45,16 +45,7 @@ public class NioServerDemo {
                 if (next.isAcceptable()) {
                     SocketChannel accept = serverSocketChannel.accept();
                     accept.configureBlocking(false);
-                    accept.register(selector, SelectionKey.OP_READ);
-                }
-                if (next.isReadable()) {
-                    SocketChannel channel = (SocketChannel) next.channel();
-                    SocketAddress remoteAddress = channel.getRemoteAddress();
-                    ByteBuffer byteBuffer = ByteBuffer.allocate(128);
-                    int read = channel.read(byteBuffer);
-                    System.out.println("from "+remoteAddress.toString()+": " + new String(byteBuffer.array(),0,read));
-                    byteBuffer.flip();
-                    channel.write(byteBuffer);
+                    eventLoopGroup.next().submit(accept);
                 }
             }
         }
