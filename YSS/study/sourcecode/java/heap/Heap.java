@@ -77,6 +77,10 @@ public class Heap<T extends Comparable<T>> {
         return size == 0;
     }
 
+    public int size(){
+        return size;
+    }
+
     public static void main(String[] args) {
         Heap<Integer> heap = new Heap<>(5);
         for (int i = 0; i < 5; i++) {
