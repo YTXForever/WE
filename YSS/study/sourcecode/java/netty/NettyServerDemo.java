@@ -23,7 +23,7 @@ public class NettyServerDemo {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .childAttr(AttributeKey.valueOf("name"), "child")
-                .handler(new ChannelInboundHandlerAdapter(){
+                .handler(new ChannelInboundHandlerAdapter() {
                     @Override
                     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
                         System.out.println("added");
@@ -42,17 +42,14 @@ public class NettyServerDemo {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
-                            @Override
-                            protected void channelRead0(ChannelHandlerContext channelHandlerContext, String o) throws Exception {
-                                System.out.println("from client:"+o);
-                            }
-
-                            @Override
-                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                                System.out.println("error");
-                            }
-                        });
+//                        socketChannel.pipeline().addLast(new InBHandlerSimple());
+                        socketChannel.pipeline().addLast(new InBHandlerA());
+                        socketChannel.pipeline().addLast(new InBHandlerB());
+                        socketChannel.pipeline().addLast(new InBHandlerC());
+                        socketChannel.pipeline().addLast(new InBHandlerEx());
+//                        socketChannel.pipeline().addLast(new OBHandlerA());
+//                        socketChannel.pipeline().addLast(new OBHandlerB());
+//                        socketChannel.pipeline().addLast(new OBHandlerC());
                     }
                 });
 
