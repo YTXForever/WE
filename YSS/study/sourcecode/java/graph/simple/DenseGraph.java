@@ -33,7 +33,7 @@ public class DenseGraph implements Graph {
     }
 
     @Override
-    public Iterable<Integer> adj(int v) {
+    public LinkedList<Integer> adj(int v) {
         LinkedList<Integer> list = new LinkedList<>();
         boolean[] arr = this.matrix[v];
         for (int i = 0; i < arr.length; i++) {

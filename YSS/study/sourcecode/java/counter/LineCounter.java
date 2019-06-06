@@ -60,12 +60,12 @@ public class LineCounter {
     }
 
     public static void main(String[] args) throws IOException {
-        long l = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
-            int line = countLine1("/Users/yuh/develop/myprojects/sevendays/src/main/java", ".java");
-        }
-        System.out.println(System.currentTimeMillis()-l);
-//        int line1 = countLine1("/Users/yuh/develop/myprojects/sevendays/src/main/java", ".java");
-//        System.out.println(line1);
+//        long l = System.currentTimeMillis();
+//        for (int i = 0; i < 100; i++) {
+//            int line = countLine1("/Users/yuh/develop/myprojects/sevendays/src/main/java", ".java");
+//        }
+//        System.out.println(System.currentTimeMillis()-l);
+        int line1 = countLine1("/Users/yuh/develop/myprojects/sevendays/src/main/java", ".java");
+        System.out.println(line1);
     }
 }

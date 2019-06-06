@@ -36,7 +36,7 @@ public class SparseGraph implements Graph {
     }
 
     @Override
-    public Iterable<Integer> adj(int v) {
+    public LinkedList<Integer> adj(int v) {
         return matrix[v];
     }
 

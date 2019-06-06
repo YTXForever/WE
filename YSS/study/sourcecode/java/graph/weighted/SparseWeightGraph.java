@@ -17,12 +17,23 @@ public class SparseWeightGraph implements WeightGraph {
     private boolean directly;
     private LinkedList<Edge>[] matrix;
     private int e;
+    private Vertex[] vertices;
+    static class Vertex{
+        int x;
+        int y;
+
+        public Vertex(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
 
     public SparseWeightGraph(int v, boolean directly) {
         this.v = v;
         this.directly = directly;
         matrix = (LinkedList<Edge>[]) new LinkedList[v];
+        vertices = new Vertex[v];
         for (int i = 0; i < matrix.length; i++) {
             matrix[i] = new LinkedList<>();
         }
@@ -36,6 +47,14 @@ public class SparseWeightGraph implements WeightGraph {
             matrix[w].add(new Edge(w, v, weight));
         }
         e++;
+    }
+
+    public void set(int index,int x,int y){
+        vertices[index] = new Vertex(x,y);
+    }
+
+    public Vertex get(int index){
+        return vertices[index];
     }
 
 

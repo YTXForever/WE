@@ -113,6 +113,17 @@ public class IndexHeap<T extends Comparable<T>> {
         reverse[indexes[j]] = j;
     }
 
+    public boolean contains(int index){
+        return data[index] != null;
+    }
+
+    public void change(int index,T t){
+        data[index] = t;
+        int i = reverse[index];
+        shiftUp(i);
+        shiftDown(i);
+    }
+
     public boolean isEmpty() {
         return size == 0;
     }

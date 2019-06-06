@@ -1,5 +1,7 @@
 package graph.simple;
 
+import java.util.LinkedList;
+
 /**
  * 无权图的接口
  * @author yuh
@@ -8,7 +10,7 @@ package graph.simple;
 public interface Graph {
 
     void add(int v,int w);
-    Iterable<Integer> adj(int v);
+    LinkedList<Integer> adj(int v);
     int v();
     int e();
     boolean directly();
