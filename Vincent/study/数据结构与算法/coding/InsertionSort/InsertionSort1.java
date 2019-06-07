@@ -77,7 +77,7 @@ public class InsertionSort1 {
         System.out.println("sort1耗时：" + (time2 - time1) + "ms");
         System.out.println("sort2耗时：" + (time3 - time2) + "ms");
         check(arr, "sort");
-        check(arr1, "sort1");
+        check(arr1, "sort");
         check(arr2, "sort2");
     }
 
