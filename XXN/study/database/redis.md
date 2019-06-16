@@ -34,11 +34,15 @@ sortedset(有序)：zadd mysortset 3 abc;zadd mysortset 1 def;
 
 4.高级数据类型
 
-  HyperLogLog：计数
+  HyperLogLog：不精确计数：eg  PFADD  databases  "Redis"  "MongoDB"  "MySQL"  PFCOUNT database  (去重数量 3)。占据12k内存(pf使用2的14次幂的桶，每个桶maxbit 6bit，)，数值量小，使用稀疏矩阵
 
   Geo：地理位置
 
 ## 3.redis底层数据结构
+
+3.1String
+
+​    长度最大512M
 
 ## 4.海量key，如何查询出某一固定前缀的key
 
@@ -62,9 +66,19 @@ SCAN
 
 ### 5.2zookeeper实现
 
-## 6.如何防止redis雪崩
+## 6.redis各种常见问题
 
-   可以在过期时间+随机串，防止同一时间缓存透传。
+### 6.1redis雪崩问题如何解决
+
+ 可以在过期时间+随机串，防止同一时间缓存透传。
+
+### 6.2缓存穿透如何解决
+
+  缓存没有，db没有。使用布隆过滤器。bloom filter：他返回结果，判断key是否在，可能会出现误判，但是判断key不存在，就一定不存在。eg: bf.exists codehole user4
+
+### 6.3缓存预热
+
+系统上线前，提前将数据放入缓存中，防止缓存没有，直接打到db
 
 ## 7.异步队列
 
@@ -111,3 +125,61 @@ BLPOP  KEY[KEY...] TIMEOUT   阻塞blpop,超时时间是timeout
 ​    备份redis所有指令。(除查询命令外)
 
    redis.conf中的appendonly no 默认aof关掉.   appendfsync always/everysec/no   always：当内存中数据有变化时，写入aof文件。everysec:将缓存中每秒写入rof中   no：是写入aof时机交给系统；一般系统在内存满了的时候，再写入文件。
+
+8.3redis如何重写AOF文件
+
+  redis先fork一个子进程，写入一个全新的文件。他会根据现有的数据生成命令(不依赖老AOF文件)，再此过程中，命令持续写入内存buffer及老AOF文件中，新文件会追加buffer中的命令行。最终将旧aof文件淘汰掉。
+
+8.4持久化方式
+
+AOF+RDB:默认使用(redis4.0)
+
+BGSAVE+AOF(增量)
+
+## 9.REDIS主从同步
+
+CAP:一致性、可用性、分区容忍性
+
+
+
+### 9.1全量同步
+
+​    slaves发送sync命令给master，master启动一个进程将数据快照保存至文件中(BGSAVE)，master将期间的命令保存至内存buffer中，文件写完后同步给slave；slave加载新的rdb文件；master期间会将新的命令更改数据同步给slave。
+
+### 9.2增量同步
+
+master分析命令是否要发送给slave(写命令)，追加AOF文件，将操作同步给slaves，对齐主从数据库，将缓存的命令写入指令，slave进行同步
+
+### 9.3无盘复制
+
+Redis 2.8.18 版开始支持无盘复制。所谓无盘复制是指主服务器直接通过套接字将快照内容发送到从节点，生成快照是一个遍历的过程，主节点会一边遍历内存，一边将序列化的内容发送到从节点，从节点还是跟之前一样，先将接收到的内容存储到磁盘文件中，再进行一次性加载
+
+## 10哨兵模式
+
+#### 10.1流言协议
+
+每个节点随机与对方通信，最终节点状态达成一致
+
+种子节点定时随机向其他节点发送节点列表及广播信息
+
+不保证信息会送达，但是最终一致性。
+
+### 10.2master挂掉，消息丢失怎么办?
+
+redis使用异步同步，如果master挂掉，slaves可能没有完全获取完，造成数据不一致的现象。
+
+可以使用配置文件 
+
+min-slaves-to-write 1master下面至少有一个slave保持正常的复制，否则停止对外写服务
+
+min-slaves-max-lag 10        如果10s未收到slave同步反馈，说明该slaves复制状态不正常
+
+### 11集群
+
+一致性hash算法，分配哈希槽。
+
+hash环数据倾斜问题:增加虚拟节点
+
+## 10.redis key淘汰机制
+
+   
