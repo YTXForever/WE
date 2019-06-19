@@ -28,10 +28,28 @@ znode:1.节点数据 存储的协调数据(状态、位置、配置等信息)
 
 一个client连接到server，会分配一个id，客户端会定期发送心跳至服务端(ticktime)，server端如果超时未收到心跳(2ticktime),z则判定client死掉。会话中请求FIFO执行
 
+#### 1.1.3命令
+
+create -e /etc 111创建临时节点
+
+get /etc 获取/etc节点内容
+
+rmr /etc 递归删除/etc节点内容
+
+set /etc 345 修改节点/etc的内容
+
 ## 2.zookeeper配置中心
 
 ### 2.1watch机制
 
 客户端发送watch命令，可以监听节点变化
+
+两类watch
+
+data watch:监听数据变化  
+
+child watch:接听子节点状态变更(增删)
+
+watch:一次性触发，触发后即删除。需要持续设置watch。客户端先得到watch通知，在得到变化结果。
 
 ### 2.2配置中心
