@@ -10,6 +10,12 @@ tickTime 2000心跳时间
 
 dataDir:文件数据存放地方
 
+initLimit=10:初始化时，节点之间信息同步，最大心跳。代表10*tickTime
+
+syncTime=5 主从同步时间 5*tickTime
+
+3个端口号: clientPort：client连接端口号，数据同步，leader选举
+
 ### 1.1znode
 
 znode:1.节点数据 存储的协调数据(状态、位置、配置等信息)
@@ -75,3 +81,9 @@ Real time:  znode节点创建修改将时间戳放入state。
 #### 3.1.3内存存储
 
 #### 3.1.4可集群化
+
+## 4.zookeeper集群
+
+### 4.1可靠的集群
+
+每个zk部署在单个节点，使用奇数个节点(选举机制决定)，大多数节点准备即可使用
