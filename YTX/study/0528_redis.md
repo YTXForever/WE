@@ -44,8 +44,12 @@ rpush/rpop，从表尾进行操作；rpush和lpop组合实现先进先出；
 
 ## 从海量的数据中获取某前缀的数据
 
-- keys pattern：keys k1*,查找所有符合模式的key，数据量大时，对redis服务器和内存都是隐患；
-- scan cursor [MATCH pattern][COUNT count]：scan 0 match k1* count 10,返回0时，扫描结束，否则将返回的cusor用于下一次命令的cusor。
+- keys pattern：keys k1*,**注意数据量**
+查找所有符合模式的key，数据量大时，对**redis服务器**和**内存**都是隐患；
+
+- scan cursor [MATCH pattern][COUNT count]：
+scan 0 match k1* count 10,返回0时，扫描结束，否则将返回的cusor用于
+下一次命令的cusor。count 10 不能保证返回10条数据，只能大概率返回10条数据
 
 **注：scan有可能返回重复数据**
 
@@ -84,7 +88,8 @@ rpush/rpop，从表尾进行操作；rpush和lpop组合实现先进先出；
 ## redis持久化
 1. RDB（快照）持久化：保存某个时间点点全量数据快照，内存数据的全量同步，因I/O而严重影响性能。
     - save:阻塞redis服务器进行，直到RDB文件创建完毕；
-    - bgsave：fork储一个子进程创建RDB文件，不阻塞服务器进程，lastsave命令记录上一次持久化时间。
+    - bgsave：fork储一个子进程创建RDB文件，不阻塞服务器进程，lastsave命令记录上一次持久化时间，
+    linux使用copy-on-write机制实现rdb持久化。
     
 2. 自动触发RDB持久化点方式
     - redif.conf配置文件中的save m n定时触发（使用bgsave）
@@ -101,8 +106,47 @@ rpush/rpop，从表尾进行操作；rpush和lpop组合实现先进先出；
     - AOF的缺点：文件体积大，恢复时间长。
 5. RDB-AOF混合持久化方式（默认方式）
     - bgsave做镜像全量持久化，AOF做增量持久化
-    
+ 
+6. aof重写带来的问题：
+原因：aof rewrite与fsync同时进行时（操作的是同一个文件），会导致I/O性能受损
+（redis主线程为单线程啊），无法响应客户端请求
+解决方案：no-appendfsync-on-rewrite的值设置为yes表示rewrite期间对
+新写操作不fsync,暂时存在内存中,等rewrite完成后再写入。
+
+## 解决aof重写问题的几个相关配置
+config key | value含义
+--- | ---
+no-appendfsync-on-rewrite | 设置为yes表示rewrite期间对新写操作不fsync,暂时存在内存中,等rewrite完成后再写入
+auto-aof-rewrite-percentage | 当前AOF文件大小是上次日志重写得到AOF文件大小的X/100倍时，自动启动新的日志重写过程
+auto-aof-rewrite-min-size | 当前AOF文件启动新的日志重写过程的最小值，避免刚刚启动Reids时由于文件尺寸较小导致频繁的重写
+
+## redis的坑
+1、aof rewrite与fsync同时进行导致的I/O性能问题
+2、rdb或者aof重写 fork子线程导致的阻塞问题，
+所以在一台服务器上最好要预留一半的内存（防止出现AOF重写集中发生，出现swap
+和OOM）。虽说子进程可以共享父进程的数据，但还是需要复制父进程的内存页表，
+如果redis的内存很大，那么这个内存页表也将是非常巨大的，可能达到百兆，此时进
+行复制，会导致堵塞。
+
+**另外，fork导致内存不足，占用虚拟内存，导致朱进称阻塞**
+
 ## redis主从同步（最终一致性）
+## redis主从同步过程
+*全量同步过程*
+1. slave发送sync到master
+2. master启动后台进程 生成rdb快照
+3. master将写rdb快照期间的写命令缓存
+4. master将文件发给slave
+5. slave恢复数据快照
+6. master将写命令的缓存数据发送给slave
+*增量同步过程*：
+正常运行期间的更新操作之后，都会将被执行的写命令发送给从节点
+1. master接收用户指令，判断是否需要同步到slave
+2. master将命令append到aof文件中
+3. master同步给slave节点，将指令写入master的响应缓存中（首先要对其主从数据库，保证需要同步到slave是正确的）
+4. 将缓存中的数据发送给slave
+
+
 ## redis sentinel
 *解决主从同步master宕机后的主从切换*
 
@@ -110,6 +154,15 @@ rpush/rpop，从表尾进行操作；rpush和lpop组合实现先进先出；
 #### 一致性哈希算法
 *对2^32取模将哈希值空间组织成虚拟的圆环*
 #### 引入虚拟节点解决数据倾斜问题
+在实际应用中一般将虚拟节点设置为32或者更大
+
+## 以上笔记如有不对，请以以下文档为主
+http://youzhixueyuan.com/redis-high-availability.html
+
+https://mp.weixin.qq.com/s/nOfd37J21axDMnlYK9WDrg
+
+
+
 
    
 
