@@ -1,7 +1,9 @@
 package sum;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author yuh
@@ -9,8 +11,9 @@ import java.util.HashMap;
  **/
 public class TwoSum {
 
-    public static int[] twoSum(int[] arr,int k){
+    public static List<int[]> twoSum(int[] arr, int k){
         HashMap<Integer, Integer> map = new HashMap<>();
+        ArrayList<int[]> list = new ArrayList<>();
         int index = 0;
         for (int i : arr) {
             map.put(i,index++);
@@ -18,19 +21,22 @@ public class TwoSum {
         for (int i = 0; i < arr.length; i++) {
             int i1 = arr[i];
             Integer index1 = map.get(k - i1);
-            if(index1 != null && index1 != i){
+            if(index1 != null && index1 > i){
                 int[] rt = new int[2];
                 rt[0] = i;
                 rt[1] = index1;
-                return rt;
+                list.add(rt);
             }
         }
-        return null;
+        return list;
     }
 
 
     public static void main(String[] args) {
-        int[] arr = {2, 5, 7, 9};
-        System.out.println(Arrays.toString(twoSum(arr,11)));
+        int[] arr = {2, 5, 7, 9,0};
+        List<int[]> list = twoSum(arr,7);
+        for (int[] a : list) {
+            System.out.println(Arrays.toString(a));
+        }
     }
 }
