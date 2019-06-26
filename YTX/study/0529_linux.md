@@ -45,6 +45,8 @@
 2. 以Str为前缀：^Str；以Str为后缀：Str$
 3. 删除空行：sed -i '/^ *$/d' file:最后一个'/'之后的d表示删除
 
+## 熟悉jmap jstat jstack netstat命令
+
 
 
 
