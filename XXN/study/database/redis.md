@@ -194,7 +194,7 @@ BLPOP  KEY[KEY...] TIMEOUT   阻塞blpop,超时时间是timeout
 
 ## 8.redis持久化
 
-8.1RDB
+### 8.1RDB
 
 ​     保存某个时间点数据快照
 
@@ -212,21 +212,47 @@ BLPOP  KEY[KEY...] TIMEOUT   阻塞blpop,超时时间是timeout
 
 ​      自动化RDB复制？  a)配置文件中save 900 1这种配置  b)主从复制，主结点主动触发 c)执行debug reload  d）执行shutdown且没有开持久化
 
-8.2AOF
+### 8.2AOF
 
 ​    备份redis所有指令。(除查询命令外)
 
    redis.conf中的appendonly no 默认aof关掉.   appendfsync always/everysec/no   always：当内存中数据有变化时，写入aof文件。everysec:将缓存中每秒写入rof中   no：是写入aof时机交给系统；一般系统在内存满了的时候，再写入文件。
 
-8.3redis如何重写AOF文件
+   **redis如何重写AOF文件**
 
-  redis先fork一个子进程，写入一个全新的文件。他会根据现有的数据生成命令(不依赖老AOF文件)，再此过程中，命令持续写入内存buffer及老AOF文件中，新文件会追加buffer中的命令行。最终将旧aof文件淘汰掉。
+  redis先fork一个子进程，写入一个全新的文件。他会根据现有的数据生成命令(不依赖老AOF文件)，再此过程中，命令持续写入内存buffer及老AOF文件中。子进程批量写入新文件中（默认32M），写完通知父进程。父进程会将原AOF的缓存中的命令回写至新文件。最终将旧aof文件淘汰掉。
 
-8.4持久化方式
+### 8.3持久化方式
 
 AOF+RDB:默认使用(redis4.0)
 
 BGSAVE+AOF(增量)
+
+### 8.4AOF重写导致常见问题
+
+#### 8.4.1fork操作：
+
+fork操作执行，会copy父进程的物理内存页，一次fork操作是非常费时间。可以通过INFO命令返回的*latest_fork_usec* 字段查询上一次fork子进程使用多长时间。
+
+优化：1、使用物理机或高效优化fork的虚拟机内核技术2、控制redis的内存大小  3.合理内存分配策略 4.降低fork频率，减少不必要的AOF全量复制
+
+#### 8.4.2子进程开销
+
+不要将redis进程绑定单核CPU执行，因为子进程再重写的时候CPU使用率90%，会与父进程争抢CPU。避免与CPU密集型应用放在一起。
+
+子进程再写AOF重写时，会对磁盘造成压力。iostat 监控磁盘io读写
+
+确保内存足够，子进程与父进程一般使用相同的内存。防止内存不够，fork进程失败
+
+ no-appendfsync-on-rewrite设置为no，因为子进程再AOF重写的时候磁盘IO会增大；而父进程也在同时进行原AOF文件重写。磁盘压力增大，可能会阻塞主线程。将这个指标设置为no，再AOF重写的时候，不进行新命令同步磁盘的工作，只是将新命令放入缓冲区内。(假设此时崩溃，最多损失30s数据)
+
+#### 8.4.3AOF追加阻塞
+
+常见的aof设置是appendfsync everysecs，每秒进行AOF文件追加。redis会使用另一条线程每秒执行fsync同步硬盘，当系统繁忙的时候，会阻塞主进程。
+
+1.如果由于fsync指令，拖慢主进程：通过INFO指令的aofdelayedfsync查看fsync指令阻塞aof延迟问题
+
+2.单机多实例，尽量避免实例再同一时间进行aof文件写入
 
 ## 9.REDIS主从同步
 
@@ -247,6 +273,12 @@ master分析命令是否要发送给slave(写命令)，追加AOF文件，将操�
 Redis 2.8.18 版开始支持无盘复制。所谓无盘复制是指主服务器直接通过套接字将快照内容发送到从节点，生成快照是一个遍历的过程，主节点会一边遍历内存，一边将序列化的内容发送到从节点，从节点还是跟之前一样，先将接收到的内容存储到磁盘文件中，再进行一次性加载
 
 ## 10哨兵模式
+
+哨兵模式：一个独立的进程，通过发送命令，监控redis实例的可用性；master/slave切换，当master宕机，哨兵自动将slave切换为master，发布订阅至所有节点，更换配置文件，告知切换新master。可以使用多哨兵模式。
+
+多哨兵模式:当主观下线的节点是主节点时，此时该哨兵3节点会通过指令sentinel is-masterdown-by-addr寻求其它哨兵节点对主节点的判断，当超过quorum（选举）个数，此时哨兵节点则认为该主节点确实有问题，这样就客观下线了，大部分哨兵节点都同意下线操作，也就说是客观下线
+
+哨兵的作用:
 
 #### 10.1流言协议
 
@@ -272,6 +304,20 @@ min-slaves-max-lag 10        如果10s未收到slave同步反馈，说明该slav
 
 hash环数据倾斜问题:增加虚拟节点
 
-## 10.redis key淘汰机制
+## 12.redis key淘汰机制
 
-   
+   通过redis.conf的maxmemory-policy配置修改淘汰机制；默认是noeviction。内存不够用，报错
+
+noeviction：当内存使用达到阈值的时候，所有引起申请内存的命令会报错。
+
+allkeys-lru：在主键空间中，优先移除最近未使用的key。
+
+ volatile-lru：在设置了过期时间的键空间中，优先移除最近未使用的key。
+
+allkeys-random：在主键空间中，随机移除某个key。
+
+volatile-random：在设置了过期时间的键空间中，随机移除某个key。
+
+ volatile-ttl：在设置了过期时间的键空间中，具有更早过期时间的key优先移除。
+
+ 
