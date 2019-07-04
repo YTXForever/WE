@@ -45,4 +45,15 @@ public class Path1 {
         }
         return res[0][0];
     }
+
+    public static void main(String[] args) {
+        boolean[][] point = new boolean[2][2];
+        for (int i = 0; i < point.length; i++) {
+            for (int j = 0; j < point[0].length; j++) {
+                point[i][j] = true;
+            }
+        }
+        point[0][1] = false;
+        System.out.println(paths(point));
+    }
 }
