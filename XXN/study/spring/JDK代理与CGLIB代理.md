@@ -68,6 +68,8 @@ public static void main(String[] args) {
 
 ## 2.2源码解析
 
+使用asm，操作字节码
+
 MethodProxy当方法被MethodInterceptor拦截的时候，生成代理类。
 
 Object result = proxy.invokeSuper(obj, args1);显示调用了MethodProxy的invokeSuper方法。该方法会生成代理类、被代理类的fastclass文件。将FastClassInfo信息放到内存中。
