@@ -33,3 +33,39 @@ c)拿到BeanDefinitionHolder后，会去DefaultListableBeanFactory注册，在Be
 **4.beanFactory创建后，执行方法**：(可扩展，可继承AbstractApplicationContext实现postProcessBeanFactory方法)
 
 **5.初始化及注册所有的BeanFactoryPostProcessor的bean**
+
+
+
+
+
+
+
+
+
+5.InvokeBeanFactoryPostProcessors(beanFactory);   执行factory创建后方法；如果AbstractApplicationContext内部beanFactoryPostProcessors存在；则初始化。当是BeanDefinitionRegistryPostProcessor；则执行postProcessBeanDefinitionRegistry方法(自己可以实现BeanDefinitionRegistryPostProcessor，做一些操作，eg:mybatis在这步骤做了数据库相关属性的配置)
+
+
+
+6.registerBeanPostProcessors
+
+将继承BeanPostProcessor的类，放置到beanFactory里面
+
+7.注册MessageSource    beanfactory
+
+8.注册应用事件广播的bean   beanfactory
+
+9.onRefresh();初始化特殊的bean
+
+10.注册application事件监听器
+
+11.冻结spring bean加载(加载bean信息到此结束，不接受以后的更改)；初始化非懒加载的bean
+
+初始化非懒加载bean:
+
+a）merge bean的beanDefinition;如果parent=null,那么merge RootBeanDefinition;否则递归merger parent及祖先的beanDefinition
+
+b）当bean满足单例、非懒加载、非abstract;创建单例对象，currentHashMap中(与beanName对应)；如果获取的是一个工厂bean，那么由指定工厂创建bean返回示例
+
+​    如何生成bean  createBean：调用init-method方法；在执行BeanPostProcessor中的postProcessAfterInitialization方法(用户可以自定义)
+
+12.设置初始化标识完成
