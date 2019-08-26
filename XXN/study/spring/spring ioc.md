@@ -1,3 +1,7 @@
+# Spring IOC
+
+
+
 源码解析：[http://www.importnew.com/27469.html](http://www.importnew.com/27469.html)
 
 ![img](C:/Users/angel/AppData/Local/YNote/data/qqA40C46AA4C8275AE6482B24AC4482831/34ff0e1be07e4bcd8b74e78955395a56/clipboard.png)
@@ -89,3 +93,44 @@ spring在加载配置文件，dom解析的时候，如果发现namespace不是de
 ![img](C:/Users/angel/AppData/Local/YNote/data/qqA40C46AA4C8275AE6482B24AC4482831/81aa529e12d34b30bfa36c034cee3d99/clipboard.png)
 
 dubbo    implements BeanPostProcessor，实现ApplicationContextAware接口的几个特殊的 beans 在初始化的时候，这个 processor 负责回调  @
+
+
+
+
+
+
+
+
+
+
+
+三、spring IOC
+
+1.依赖注入
+
+2.依赖检查
+
+3.自动装配
+
+4.支持集合
+
+5.指定初始化、销毁方法
+
+6.支持回调
+
+四、spring ioc几个重要的类
+
+BeanDefinition
+
+BeanDefinitionRegister:向IOC容器提供注册BeanDefinition方法。
+
+BeanFactory:提供IOC配置、包含bean的各类定义，实例化bean、建立bean依赖关系、bean生命周期控制
+
+五、spring注解
+
+@Component("person")标志这个类需要扫描至bean容器中
+
+@Bean("person")
+
+@ComponentScan扫描装配好的bean(定义扫描的包)
+
