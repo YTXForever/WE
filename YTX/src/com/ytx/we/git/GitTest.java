@@ -5,5 +5,6 @@ public class GitTest {
         System.out.println("hello git!");
         System.out.println("to be happy");
         System.out.println("git rebase");
+        System.out.println("what the fox say");
     }
 }
