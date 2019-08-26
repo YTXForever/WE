@@ -7,5 +7,8 @@ public class GitTest {
         System.out.println("git rebase");
         System.out.println("what the fox say");
         System.out.println("问谁呢？？");
+        System.out.println("try try push ");
+
+
     }
 }
