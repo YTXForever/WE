@@ -274,11 +274,11 @@ Redis 2.8.18 版开始支持无盘复制。所谓无盘复制是指主服务器�
 
 ## 10哨兵模式
 
+https://segmentfault.com/a/1190000002680804
+
 哨兵模式：一个独立的进程，通过发送命令，监控redis实例的可用性；master/slave切换，当master宕机，哨兵自动将slave切换为master，发布订阅至所有节点，更换配置文件，告知切换新master。可以使用多哨兵模式。
 
 多哨兵模式:当主观下线的节点是主节点时，此时该哨兵3节点会通过指令sentinel is-masterdown-by-addr寻求其它哨兵节点对主节点的判断，当超过quorum（选举）个数，此时哨兵节点则认为该主节点确实有问题，这样就客观下线了，大部分哨兵节点都同意下线操作，也就说是客观下线
-
-哨兵的作用:
 
 #### 10.1流言协议
 
@@ -297,6 +297,14 @@ redis使用异步同步，如果master挂掉，slaves可能没有完全获取完
 min-slaves-to-write 1master下面至少有一个slave保持正常的复制，否则停止对外写服务
 
 min-slaves-max-lag 10        如果10s未收到slave同步反馈，说明该slaves复制状态不正常
+
+### 10.3master切换，client端如何得知？
+
+client端订阅了一个主题号；当切换master的时候，由sentinel通知client端更换master信息。jedis是为每一个sentinel创建了一个listener，去监听事件。得到master切换以后，会重新初始化pool。
+
+### 10.4如何执行fail-over
+
+在sentinel的配置文件中，配置master的地址的同时，会配置，至少有几个sentinel认为他failover，才能发起failover选举。如果配置的是2，那么当两台sentinel发现该master 心跳出问题了，尝试去failover的sentinel会发起一轮投票，如果半数以上支持，那么会授权给这个sentinel。它从挂掉的master中获取一份最新的配置版本号。然后选举出slave变成新的master。当已授权的sentiel用最新版本的数据对slave进行failover以后，会将最新的配置广播到sentinel。其他的sentinel同步更新master配置。
 
 ### 11集群
 
@@ -320,4 +328,23 @@ volatile-random：在设置了过期时间的键空间中，随机移除某个ke
 
  volatile-ttl：在设置了过期时间的键空间中，具有更早过期时间的key优先移除。
 
- 
+### 13.redis expire机制
+
+redis  expire有两种方式:一个是get的时候去获取时间，发现过期，删除
+
+另一个:一个专门的时间事件处理器：会对每一个数据库扫描20个过期key，如果低于25%，则去下一个库处理；如果>25%则重新随机扫描20个key
+
+
+
+
+
+### 14.如果AOF文件过大，怎么办
+
+手动命令bgrewriteaof
+
+自动:redis.conf 
+
+代表当前AOF文件空间和上次重写后AOF空间的比值: auto-aof-rewrite-percentage 100
+
+AOP超过10m就开始收缩
+auto-aof-rewrite-min-size 10mb

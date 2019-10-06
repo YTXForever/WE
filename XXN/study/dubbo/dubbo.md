@@ -145,3 +145,110 @@ public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcExceptio
 ## 3.服务调用
 
 ReferenceConfig  createProxy()生成代理Invoker
+
+
+
+
+
+
+
+
+
+
+
+
+
+## SPI机制
+
+@SPI标识该接口为可扩展接口
+
+@Adaptive   实现类是该接口的适配器     dubbo会动态生成适配器类
+
+ExtensionFactory 有两种扩展实现，分别是SpiExtensionFactory和SpringExtensionFactory
+
+
+
+
+
+
+
+路由
+
+
+
+## 负载均衡(模板模式)
+
+AbstractLoadBalance
+
+1.getWeight() 获取权重：
+
+通过url上面的weight字段 。即配置文件中的<dubbo:service>中配置。该方法会判断，如果该服务的启动时间<预热时间(这两个时间都由url传过来)；那么权重会重新计算
+
+2.负载均衡算法
+
+a)随机RandomLoadBalance；
+
+b)最小并发数LeastActiveLoadBalance
+
+获取invoker同一个method的active数量。如果权重相同，则随机。如果权重不同；则生成一个随机数。根据权重，选择哪一个invoker
+
+c)一致性hash算法
+
+d)加权轮询算法RoundRobinLoadBalance。经过加权后，每台服务器能够得到的请求数比例，接近或等于他们的权重比
+
+
+
+## 容错
+
+failover：如果非业务异常，框架异常，会重试
+
+failfast
+
+failsafe   FailsafeClusterInvoker   异常返回给消费者一个空结果，不会throw Exception
+
+failback：如果调用失败，会返回消费者一个空的接口。然后会把该任务放到fail中，使用一个定时任务延时去retry，直到成功为止
+
+forkjoin
+
+
+
+
+
+
+
+## 整体服务调用流程
+
+下面是invoker的顺序
+
+#### *1.*InvokerInvocationHandler**
+
+#### 2.MockClusterInvoker  (服务降级)
+
+mock配置分三种：一种直接调用；第二种强制mock；第三种调用失败后走mock
+
+配置文件中 mock字段(设为true，表示使用缺省Mock类名，即：接口名 + Mock后缀，服务接口调用失败Mock实现类，该Mock类必须有一个无参构造函数,而Mock只在出现非业务异常(比如超时，网络异常等)时执行.Mock在远程调用后执行。)
+
+#### 3.AbstractClusterInvoker
+
+#### 4.FailfastClusterInvoker（通过service:cluster配置）
+
+负载均衡算法选择invoker
+
+#### 5.Filter  （过滤器   implements Filters）
+
+配置项: filter字段
+
+#### 6.ListenerInvokerWrapper
+
+#### 7.AbstractInvoker
+
+#### 8.DubboInvoker
+
+8.1支持三种调用方式  1.异步有返回值2.同步3.异步无返回值
+
+8.2发送请求：
+
+
+
+**HeaderExchangeClient** 
+

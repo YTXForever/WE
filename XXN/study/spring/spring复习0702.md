@@ -32,17 +32,7 @@ c)拿到BeanDefinitionHolder后，会去DefaultListableBeanFactory注册，在Be
 
 **4.beanFactory创建后，执行方法**：(可扩展，可继承AbstractApplicationContext实现postProcessBeanFactory方法)
 
-**5.初始化及注册所有的BeanFactoryPostProcessor的bean**
-
-
-
-
-
-
-
-
-
-5.InvokeBeanFactoryPostProcessors(beanFactory);   执行factory创建后方法；如果AbstractApplicationContext内部beanFactoryPostProcessors存在；则初始化。当是BeanDefinitionRegistryPostProcessor；则执行postProcessBeanDefinitionRegistry方法(自己可以实现BeanDefinitionRegistryPostProcessor，做一些操作，eg:mybatis在这步骤做了数据库相关属性的配置)
+**5.invokeBeanFactoryPostProcessors(beanFactory);**   实例化并调用所有implements BeanFactoryPostProcessor，调用postProcessBeanDefinitionRegistry方法
 
 
 
@@ -69,3 +59,28 @@ b）当bean满足单例、非懒加载、非abstract;创建单例对象，curren
 ​    如何生成bean  createBean：调用init-method方法；在执行BeanPostProcessor中的postProcessAfterInitialization方法(用户可以自定义)
 
 12.设置初始化标识完成
+
+Spring IOC的单例模式是线程安全的
+
+### **三、Spring IOC 如何保证线程安全**？
+
+createBean的时候，会将正在进行实例的bean放入singletonsCurrentlyInCreation 中，表示当前这个bean正在加载中；（Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(16));）
+
+通过这里resolveBeforeInstantiation返回一个bean(代理bean)；如果bean不为null，那么直接return一个代理类对象；
+
+否则doCreateBean创建对象：执行所有继承beanPostProcessor的；如果是MergedBeanDefinitionPostProcessor，那么执行postProcessMergedBeanDefinition方法。
+
+创建完一个单例实体，并赋予一些属性值后，执行所有继承beanPostProcessor的postProcessBeforeInitialization方法。
+
+ 在调用监听器的afterproperties,执行init-mothod方法 
+
+在执行所有继承beanPostProcessor的applyBeanPostProcessorsAfterInitialization方法。
+
+创建完成后，a)会从singletonsCurrentlyInCreation中移除这个beanName;
+
+​                     b)在singletonObjects里面添加这个bean及他的class；
+
+​	             c)从Map<String, ObjectFactory<?>> singletonFactories中移除生成这个beanName单例的objectFactory
+
+​		     d)在registeredSingletons = new LinkedHashSet<String>(256);中添加已经生成单例的beanName。
+

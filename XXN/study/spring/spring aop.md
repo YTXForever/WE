@@ -51,7 +51,7 @@ ConfigBeanDefinitionParser生成aop的beandefinition。其中configureAutoProxyC
 
 - config–>ConfigBeanDefinitionParser
 
-- aspectj-autoproxy–>AspectJAutoProxyBeanDefinitionParser
+- aspectj-autoproxy–>**AspectJAutoProxyBeanDefinitionParser**  (其中里面的AnnotationAwareAspectJAutoProxyCreator极其重要)
 
 - scoped-proxy–>ScopedProxyBeanDefinitionDecorator
 
@@ -78,3 +78,19 @@ ConfigBeanDefinitionParser生成aop的beandefinition。其中configureAutoProxyC
    around对应AspectJAroundAdvice
 
    在bean初始化的时候，判断这个bean是否需要代理，如果需要，按照设置的代理方式，生成代理对象(cglib/jdk)
+
+### ![img](https://upload-images.jianshu.io/upload_images/7853175-1c3b22e2c8c00754.png?imageMogr2/auto-orient/)
+
+  
+
+AnnotationAwareAspectJAutoProxyCreator实现了BeanPostProcessor
+
+AnnotationAwareAspectJAutoProxyCreator注册到DefaultListableBeanFactory(beanName:org.springframework.aop.config.internalAutoProxyCreator)，如果配置了proxy-target-class，那么会在beandefinition中proxyTargetClass设置位为true
+
+在执行IOC的resolveBeforeInstantiation方法；这里会扫描beanFactory中所有的Advisor的类，提取所有适用于这个bean的增强，排序后；生成代理类
+
+将生成的代理类，存放在  Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<Object, Class<?>>(16);
+
+根据proxy-target-class标识，判断生成jdk代理，还是cglib代理。
+
+在方法调用的时候JdkDynamicAopProxy的invoke方法，判断method有没有被pointcut上面的表达式命中(方法拦截器MethodInterceptor),生成一个方法调用的invoke。将需要经过的那些interceptor组成一个chain，然后调用(使用到了递归)
