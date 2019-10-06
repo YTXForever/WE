@@ -234,6 +234,19 @@ public class BinaryTree {
         return  root;
 
     }
+    public int getLayer(){
+        return getLayer(root);
+
+    }
+    private int getLayer(BinaryTreeNode root){
+        if(root == null){
+            return 0;
+        }
+        int left = getLayer(root.getLeft());
+        int right = getLayer(root.getRight());
+        return 1+(left>right?left:right);
+
+    }
 
 
 }
